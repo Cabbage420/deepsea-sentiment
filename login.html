@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Deep Sea Auth</title>
+
+<style>
+  :root{
+    --bg-1: #002424;
+    --bg-2: #001515;
+    --accent-1: #7fffd4;
+    --accent-2: #66e0ff;
+    --text: #e7fbff;
+  }
+
+  *{box-sizing:border-box}
+  html,body{
+    height:100%; margin:0;
+    font-family:Inter, system-ui, Segoe UI, Roboto;
+    background: radial-gradient(circle at center, #003832 0%, #001716 80%);
+    color:var(--text);
+    overflow:hidden;
+
+    /* login page starts visible */
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  }
+
+  .bg-wrap{position:fixed; inset:0; z-index:0; pointer-events:none}
+
+  #particles{
+    position:fixed; inset:0; overflow:hidden; z-index:0;
+  }
+
+  @keyframes rise {
+    0%{ transform:translateY(0); opacity:0 }
+    10%{ opacity:0.7 }
+    100%{ transform:translateY(-160vh); opacity:0 }
+  }
+
+  .stage{
+    position:relative; z-index:5;
+    height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:20px;
+  }
+
+  .auth-box{
+    width:400px;
+    max-width:90vw;
+    padding:28px;
+    border-radius:24px;
+
+    background:rgba(0, 40, 40, 0.45);
+    border:1.5px solid rgba(0, 255, 200, 0.13);
+
+    box-shadow:
+      0 0 25px rgba(0, 255, 200, 0.08),
+      0 15px 45px rgba(0, 20, 20, 0.55),
+      inset 0 0 18px rgba(0, 255, 200, 0.05);
+
+    backdrop-filter: blur(14px) saturate(180%);
+  }
+
+  .tabs{
+    width:100%;
+    display:flex;
+    justify-content:space-around;
+    margin-bottom:24px;
+  }
+
+  .tab-btn{
+    padding:10px 20px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    border:none;
+    border-radius:999px;
+    background:rgba(255,255,255,0.08);
+    color:var(--text);
+    transition:0.2s ease;
+  }
+  
+  .tab-btn.active{
+    background:linear-gradient(90deg, #00f7c5, #00d9b7);
+    color:#001b1b;
+    box-shadow:0 0 20px rgba(0,255,200,0.45);
+  }
+
+  .form-card{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+  }
+  .form-card.active{ display:flex }
+
+  .field{
+    width:100%;
+    padding:14px 20px;
+    border-radius:999px;
+    background:rgba(0, 40, 40, 0.55);
+    border:1.4px solid rgba(0, 255, 200, 0.14);
+    color:var(--text);
+
+    box-shadow:
+       inset 0 0 10px rgba(0, 255, 200, 0.05),
+      0 0 8px rgba(0, 255, 200, 0.08);
+
+    font-size:15px;
+    font-weight:600;
+    transition:0.15s ease;
+  }
+
+  .field:focus{
+    transform:scale(1.015);
+    border-color:rgba(0,255,200,0.55);
+    box-shadow:
+      0 0 16px rgba(0,255,200,0.25),
+      inset 0 0 14px rgba(0,255,200,0.15);
+  }
+
+  .btn-primary{
+    padding:12px 26px;
+    border-radius:999px;
+    border:none;
+    font-weight:800;
+    cursor:pointer;
+    background:linear-gradient(90deg,#00f7c5,#00d9b7);
+    color:#001b1b;
+
+    box-shadow:
+      0 0 20px rgba(0,255,200,0.45),
+      0 10px 30px rgba(0,50,50,0.5);
+
+    transition:0.15s ease;
+  }
+
+  .btn-primary:hover{ transform:translateY(-3px) }
+
+</style>
+</head>
+
+<body>
+
+<div class="bg-wrap">
+  <div id="particles"></div>
+</div>
+
+<div class="stage">
+  <div class="auth-box">
+
+    <div class="tabs">
+      <button id="loginTab" class="tab-btn active">Login</button>
+      <button id="signupTab" class="tab-btn">Signup</button>
+    </div>
+
+    <form id="loginForm" method="POST" action="/login" class="form-card active">
+      <input class="field" name="username" type="text" placeholder="Username" required />
+      <input class="field" name="password" type="password" placeholder="Password" required />
+      <button class="btn-primary" type="submit">Sign in</button>
+    </form>
+
+    <form id="signupForm" method="POST" action="/signup" class="form-card">
+      <input class="field" name="username" type="text" placeholder="Choose username" required />
+      <input class="field" name="password" type="password" placeholder="Choose password" required />
+      <button class="btn-primary" type="submit">Create account</button>
+    </form>
+
+  </div>
+</div>
+
+<script>
+/* particles */
+const container = document.getElementById("particles");
+for (let i = 0; i < 200; i++){
+  const p = document.createElement("div");
+  p.style.position="fixed";
+  p.style.borderRadius="50%";
+  const size = 4 + Math.random()*14;
+  p.style.width = size+"px";
+  p.style.height = size+"px";
+  p.style.left = Math.random()*100+"vw";
+  p.style.top = "110vh";
+  p.style.background="rgba(150,255,230,0.18)";
+  p.style.boxShadow="0 0 18px rgba(120,255,220,0.35)";
+  p.style.animation = `rise ${12+Math.random()*22}s linear ${Math.random()*4}s infinite`;
+  container.appendChild(p);
+}
+
+/* tabs */
+const loginTab = document.getElementById("loginTab");
+const signupTab = document.getElementById("signupTab");
+const loginForm = document.getElementById("loginForm");
+const signupForm = document.getElementById("signupForm");
+
+loginTab.onclick = () => {
+  loginTab.classList.add("active");
+  signupTab.classList.remove("active");
+  loginForm.classList.add("active");
+  signupForm.classList.remove("active");
+};
+
+signupTab.onclick = () => {
+  signupTab.classList.add("active");
+  loginTab.classList.remove("active");
+  signupForm.classList.add("active");
+  loginForm.classList.remove("active");
+};
+
+/* SMOOTH LOGIN TRANSITION */
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const fd = new FormData(loginForm);
+
+  document.body.style.transition = "opacity .6s ease, transform .6s ease, filter .6s ease";
+  document.body.style.opacity = "0";
+  document.body.style.transform = "translateY(-40px)";
+  document.body.style.filter = "blur(8px)";
+
+  setTimeout(async () => {
+    const r = await fetch("/login", {
+      method: "POST",
+      body: fd,
+      redirect: "manual"
+    });
+
+    if (r.type === "opaqueredirect" || r.status === 0) {
+      sessionStorage.setItem("deepsea_login", "true");
+      window.location.href = "/dashboard";
+    } else {
+      alert("Invalid credentials.");
+      document.body.style.opacity = "1";
+      document.body.style.transform = "translateY(0)";
+      document.body.style.filter = "blur(0)";
+    }
+  }, 80);
+});
+</script>
+
+</body>
+</html>
